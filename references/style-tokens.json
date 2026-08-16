@@ -1,0 +1,78 @@
+{
+  "canvas": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "duration": 30,
+    "aspect": "9:16"
+  },
+  "colors": {
+    "bg": "#000000",
+    "textPrimary": "#FFFFFF",
+    "highlight": "#D4A574",
+    "vignetteStart": "transparent",
+    "vignetteEnd": "rgba(0,0,0,0.6)",
+    "lyricGradientStart": "rgba(0,0,0,0.85)",
+    "lyricGradientMid": "rgba(0,0,0,0.4)",
+    "lyricGradientEnd": "transparent",
+    "credit": "rgba(255,255,255,0.5)",
+    "shadowWarm": "rgba(212,165,116,0.6)",
+    "shadowWarmStrong": "rgba(212,165,116,0.8)",
+    "shadowCool": "rgba(0,0,0,0.8)"
+  },
+  "typography": {
+    "fontFamily": ["KaiTi", "STKaiti", "Inter", "sans-serif"],
+    "lyric": {
+      "size": 72,
+      "weight": 700,
+      "lineHeight": 1.4,
+      "letterSpacing": 6,
+      "textShadow": [
+        "0 0 30px rgba(212,165,116,0.6)",
+        "0 0 60px rgba(212,165,116,0.3)",
+        "0 2px 4px rgba(0,0,0,0.8)"
+      ],
+      "highlight": {
+        "size": 80,
+        "weight": 900,
+        "color": "#D4A574",
+        "textShadow": [
+          "0 0 40px rgba(212,165,116,0.8)",
+          "0 0 80px rgba(212,165,116,0.5)",
+          "0 0 120px rgba(212,165,116,0.3)",
+          "0 2px 4px rgba(0,0,0,0.9)"
+        ]
+      }
+    },
+    "credit": {
+      "size": 36,
+      "weight": 400,
+      "color": "rgba(255,255,255,0.5)",
+      "letterSpacing": 10
+    }
+  },
+  "layout": {
+    "lyricsBottom": 250,
+    "lyricsSidePadding": 80,
+    "creditBottom": 150,
+    "lyricGradientHeight": 600
+  },
+  "animation": {
+    "durIn": 0.6,
+    "durOut": 0.4,
+    "elasticDur": 1.2,
+    "elasticEase": "elastic.out(1, 0.5)",
+    "glowDur": 1.5,
+    "glowEase": "sine.inOut",
+    "creditDur": 1.0,
+    "easeIn": "power2.out",
+    "easeOut": "power2.in"
+  },
+  "video": {
+    "cropWidth": 1215,
+    "cropHeight": 2160,
+    "scaleWidth": 1080,
+    "scaleHeight": 1920,
+    "objectFit": "cover"
+  }
+}

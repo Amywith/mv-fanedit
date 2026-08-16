@@ -1,0 +1,26 @@
+{
+  "name": "mv-fanedit",
+  "version": "1.0.0",
+  "description": "MV Fan-Edit Skill — HyperFrames music video remix with director-level storyboarding, dynamic lyrics, and vertical video output",
+  "main": "mv-fanedit.js",
+  "bin": {
+    "mv-fanedit": "./mv-fanedit.js"
+  },
+  "scripts": {
+    "test": "node mv-fanedit.js test-project"
+  },
+  "keywords": [
+    "hyperframes",
+    "music-video",
+    "mv-remix",
+    "vertical-video",
+    "gsap",
+    "fan-edit"
+  ],
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "hyperframes": "latest"
+  },
+  "devDependencies": {}
+}
