@@ -1,36 +1,49 @@
-// 从 MV 按分镜时间码裁切竖屏片段
-// 用法：node shot-extractor.js <config.json> [output_dir]
+// 从 MV 按分镜时间码裁切竖屏片段 + 固定关键帧
+// 用法：node shot-extractor.js <config.json> [projectDir]
 
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-function cropVertical(src, dst, start, duration, cropX) {
-  // 3840x2160 -> 竖屏 1080x1920，裁切宽=1215(=2160*9/16)
-  const cropW = 1215;
-  const cropH = 2160;
+function probeVideo(videoPath) {
+  const out = execSync(`ffprobe -v quiet -show_entries stream=width,height -of csv=p=0 "${videoPath}"`, { encoding: 'utf8' }).trim();
+  const [w, h] = out.split(',').map(Number);
+  return { w, h };
+}
+
+function cropVertical(src, dst, start, duration, cropX, srcW, srcH) {
+  const cropH = srcH;
+  const cropW = Math.round(cropH * 9 / 16);
   const vf = `crop=${cropW}:${cropH}:${cropX}:0,scale=1080:1920,setsar=1`;
-  const cmd = `ffmpeg -y -ss ${start} -i "${src}" -t ${duration} -vf "${vf}" -c:v libx264 -pix_fmt yuv420p -an "${dst}"`;
+  const cmd = `ffmpeg -y -ss ${start} -i "${src}" -t ${duration} -vf "${vf}" -c:v libx264 -r 30 -g 30 -keyint_min 30 -movflags +faststart -pix_fmt yuv420p -an "${dst}"`;
   execSync(cmd, { stdio: 'ignore' });
 }
 
 function main() {
   const configPath = process.argv[2];
-  const outDir = process.argv[3] || 'renders';
+  const projectDir = process.argv[3] || path.dirname(configPath);
   if (!configPath) {
-    console.error('Usage: node shot-extractor.js <config.json> [output_dir]');
+    console.error('Usage: node shot-extractor.js <config.json> [projectDir]');
     process.exit(1);
   }
   const cfg = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-  fs.mkdirSync(outDir, { recursive: true });
+  const rendersDir = path.join(projectDir, 'renders');
+  fs.mkdirSync(rendersDir, { recursive: true });
 
-  cfg.shots.forEach((shot, i) => {
-    const dur = shot.mv_end - shot.mv_start;
-    const dst = path.join(outDir, `shot${i+1}.mp4`);
-    console.log(`[${i+1}/${cfg.shots.length}] ${shot.label}  ${shot.mv_start}-${shot.mv_end}s  crop_x=${shot.crop_x}`);
-    cropVertical(cfg.mv_path, dst, shot.mv_start, dur, shot.crop_x);
+  const mvPath = path.join(projectDir, cfg.mv_path);
+  const { w: srcW, h: srcH } = probeVideo(mvPath);
+  const cropH = srcH;
+  const cropW = Math.round(cropH * 9 / 16);
+  console.log(`📐 源视频 ${srcW}x${srcH} → 裁切 ${cropW}x${cropH} (9:16)`);
+
+  cfg.shots.forEach((s, i) => {
+    const dur = s.mv_end - s.mv_start;
+    const dst = path.join(rendersDir, `shot${i+1}_fixed.mp4`);
+    console.log(`  shot${i+1}: ${s.mv_start}-${s.mv_end}s (${s.label}) crop_x=${s.crop_x}`);
+    const vf = `crop=${cropW}:${cropH}:${s.crop_x}:0,scale=1080:1920,setsar=1`;
+    execSync(`ffmpeg -y -ss ${s.mv_start} -i "${mvPath}" -t ${dur} -vf "${vf}" -c:v libx264 -r 30 -g 30 -keyint_min 30 -movflags +faststart -pix_fmt yuv420p -an "${dst}"`, { stdio: 'ignore' });
   });
-  console.log('✅ 所有片段裁切完成 →', outDir);
+  console.log('✅ 所有片段裁切完成 →', rendersDir);
 }
 
 main();
